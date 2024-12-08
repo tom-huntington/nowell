@@ -1,9 +1,10 @@
-start: ident | call | closure
+start: ident | call | closure | expr
 call: (call | expr) ("_ " expr)* expr expr
-?expr: "\\" (expr | closure) | ident | "(" (ident | call | closure) ")"
+?expr: "\\" (expr | call | ident | closure | partial) | ident | "(" (ident | call | closure | partial) ")"
+partial: expr expr
 closure: IDENT+ "-> " (expr | call)
 ident: IDENT
-IDENT: /[A-Za-z_0-9]+/
+IDENT: /\||(str\.)?[A-Za-z_0-9\.]+/
 
 %import common.WS
 %ignore WS
