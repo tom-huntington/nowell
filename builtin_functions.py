@@ -21,8 +21,8 @@ rename_illegal = {
     "in": "in_",
     # "sorted": "sorted_",
     "not": "not_",
-    ".": "reverse_function_application",
-    "|": "b",
+    "|": "reverse_function_application",
+    ".": "b",
     "map": "flipped_map",
     "starmap": "flipped_starmap",
 }

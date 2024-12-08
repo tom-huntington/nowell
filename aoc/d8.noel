@@ -1,3 +1,3 @@
 from itertools import starmap
 
-read | str.splitlines | enumerate | (starmap (i r -> r . enumerate starmap (j c -> i complex j pair c ))) | flatten | dict
+read . str.splitlines . enumerate . (starmap (i r -> r | enumerate starmap (j c -> i complex j pair c ))) . flatten . dict
