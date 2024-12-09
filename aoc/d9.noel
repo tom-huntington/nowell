@@ -1,0 +1,4 @@
+from operator import mul
+from operator import mod
+from operator import floordiv
+read . (map int) . enumerate . (starmap \i n -> i |> (even _ (floordiv 2)  conditional (None K) ) pair n ) 
