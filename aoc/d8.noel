@@ -1,3 +1,6 @@
 from itertools import starmap
+from itertools import product
+from operator import sub
 
-read . str.splitlines . enumerate . (starmap (i r -> r | enumerate starmap (j c -> i complex j pair c ))) . flatten . dict
+read . str.splitlines . enumerate . (starmap \i r -> r |> enumerate starmap (j c -> i complex j pair c )) . flatten
+. (product |> S) . (starmap \a b -> a pair b)

@@ -4,7 +4,9 @@ from lark.visitors import Interpreter
 import re
 from inspect import signature
 from functools import partial
+import itertools
 from builtin_functions import *
+from collections.abc import Iterable
 
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'grammar.lark')) as f:
@@ -12,9 +14,32 @@ with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'grammar.lark
 
 parser = Lark(grammar)
 
+
+def flatten_irregular(xs):
+    for x in xs:
+        if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
+            yield from flatten(x)
+        else:
+            yield x
+
+
 def provide_env(tree, env_names):
     if tree.data.value == "closure":
-        env_names = env_names | set(name.value for name in tree.children[:-1])
+        class Flatten(Transformer):
+            def destruct(self, children):
+                return flatten_irregular(children)
+            
+            def IDENT(self, child):
+                return child.value
+            
+            def closure(self, children):
+                return tuple(flatten_irregular(children[:-1]))
+            
+        # print(tree)
+        o = Flatten().transform(tree)
+        new_names = set(o)
+        assert len(new_names) == len(o)
+        env_names = env_names.union(o)
     
     tree.env_names = env_names
     
@@ -24,14 +49,6 @@ def provide_env(tree, env_names):
         elif isinstance(child, Token):
             child.value = (child.value, env_names)
     return
-
-
-# class ProvideEnv(Interpreter):
-#     def __default__(self, tree):
-#         self.avaliable_names = 
-#         return super().__default__(tree)
-
-
 
 
 class Parser(Transformer):
@@ -55,20 +72,37 @@ class Parser(Transformer):
     #     arg, = args
     #     return arg
 
+    ncall = call
+
     def closure(self, children):
+        class ToList(Transformer):
+            def destruct(self, children):
+                return children
+            
+            def IDENT(self, child):
+                return child.value[0]
+        
         *names, body = children
-        names = tuple(token.value[0] for token in names)
+        names, = ToList().transform(Tree("dumy", children[:-1])).children
+
         needed_env = set.union(*(getattr(arg, 'needed_env', set()) for arg in children))
         
-        for name in names:
+        for name in flatten_irregular(names):
             if name in needed_env:
                 needed_env.remove(name)
     
         def closure_r(env={}):
             def closure_rr(*values):
                 env_ = dict(env)
-                env_.update(zip(names, values))
-                assert len(names) == len(values)
+                def set_variables(names, values):
+                    assert len(names) == len(values)
+                    for name, value in zip(names, values):
+                        if isinstance(name, list):
+                            set_variables(name, value)
+                        else:
+                            env_[name] = value
+                
+                set_variables(names, values)
                 return body(env_) if getattr(body, 'needed_env', False) else body
             return closure_rr
         
@@ -129,7 +163,7 @@ class Parser(Transformer):
 def evaluate_code(ex, args):
 
     while True:
-        if m := re.match(r"^from\s+(\w+)\s+import\s+(\w+)\n", ex):
+        if m := re.match(r"^\s*from\s+(\w+)\s+import\s+(\w+)\n", ex):
             # print(f"execing: {m.group()}")
             exec(m.group(), globals())
             ex = ex[m.end():]
@@ -160,12 +194,15 @@ def print_iterable(obj):
     else:
         print(obj)
 
-if __name__ == "__main__":
-    code = """from operator import sub
+code = r"""
+from itertools import product
+from operator import sub
+product |> S . (map \(a b) -> a sub b)
+"""
 
-            a b -> a . (b sub)
-            """
-    out = evaluate_code(code, [1,2])
+if __name__ == "__main__":
+            #(|| (map \a -> \b -> a pair b))
+    out = evaluate_code(code, [[1,2]])
     print_iterable(out)
 
 
