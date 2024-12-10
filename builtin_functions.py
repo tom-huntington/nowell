@@ -25,6 +25,7 @@ rename_illegal = {
     "|>": "reverse_function_application",
     #"||": "double_reverse_function_application",
     ".": "b",
+    "..": "b_curried_w",
     "map": "flipped_map",
     "starmap": "flipped_starmap",
     "filter": "flipped_filter",
@@ -155,7 +156,7 @@ def phi(f, g, h):
     return phi_r
 
 @needed_env
-def splititerate(acc, func, *, env=None):
+def split_iterate(acc, func, *, env=None):
     while True:
         acc, r = call_providing_env(func, acc, env=env)
         yield (acc, r)
@@ -206,3 +207,10 @@ def imag(c):
 def log(x):
     print(x)
     return x
+
+@needed_env
+def b_curried_w(f, g):
+    def b_curried_w_r(x):
+        x_ = f(x)
+        return g(x_)(x_)
+    return b_curried_w_r

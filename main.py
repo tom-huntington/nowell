@@ -177,7 +177,7 @@ class Parser(Transformer):
             return '    ' + b.replace('\n', '\n' + times * '    ')
         
         closure_ = f"def make_{name}(*, env):\n" + indent_block(unpackenv) + indent_block(definition) + f'\n    return {name}'
-        print(closure_)
+        # print(closure_)
         exec(closure_, globals=globals())
         c = eval(f"make_{name}")
         c.needed_env = needed_env

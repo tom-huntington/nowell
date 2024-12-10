@@ -9,9 +9,9 @@ closure: destruct "->" (eexpr | call)
 destruct: (IDENT | "(" destruct ")")+
 ident: IDENT | SPECIAL | FUNCTION | STRING | NUMBER
 STRING: /'[^']*'/
-SPECIAL: /\|>|\./ 
+SPECIAL: /\|>|\.\.|\./ 
 NUMBER: /-[0-9]+/
-IDENT: /((str|dict)\.)?[A-Za-z0-9]+/
+IDENT: /((str|dict)\.)?[A-Za-z0-9][A-Za-z0-9_]*/
 FUNCTION: /\ndef\s+([a-zA-Z_]+)\((.|\n)*?\n\n/
 
 %import common.WS
