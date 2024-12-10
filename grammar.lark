@@ -1,15 +1,18 @@
 start: ident | ncall | closure | eexpr
-call: (call | texpr) (" _ " texpr)* texpr texpr
+call: (call | texpr) ("_" texpr)* texpr texpr
 ncall: (call | texpr) (" _ " texpr)* texpr eexpr
 ?eexpr: texpr | nexpr
 ?nexpr: "\\" (eexpr | ncall | ident | closure | partial)
-?texpr: ident | "(" (ident | ncall | closure | partial) ")"
+?texpr: ident | "(" (eexpr | ident | ncall | closure | partial) ")"
 partial: texpr eexpr
 closure: destruct "-> " (eexpr | call)
 destruct: (IDENT | "(" destruct ")")+
-ident: IDENT | SPECIAL
+ident: IDENT | SPECIAL | FUNCTION | STRING | NUMBER
+STRING: /'[^']*'/
 SPECIAL: /\|>|\./ 
-IDENT: /(str\.)?[A-Za-z_0-9]+/
+NUMBER: /-[0-9]+/
+IDENT: /((str|dict)\.)?[A-Za-z0-9]+/
+FUNCTION: /\ndef\s+([a-zA-Z_]+)\((.|\n)*?\n\n/
 
 %import common.WS
 %ignore WS

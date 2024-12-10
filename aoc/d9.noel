@@ -1,4 +1,13 @@
 from operator import mul
 from operator import mod
 from operator import floordiv
-read . (map int) . enumerate . (starmap \i n -> i |> (even _ (floordiv 2)  conditional (None K) ) pair n ) 
+read . (map int) . enumerate . (starmap \i n -> i |> (even _ (floordiv 2)  conditional (None K) ) pair n ) . list .
+def defragment(mem):
+    for used_len, used_pos  in mem[::-2]:
+        for free_len, free_pos in mem[1::2]:
+            if (free_pos <= used_pos and free_len >= used_len):
+                used_pos  = free_pos
+                free_pos += used_len
+                free_len -= used_len
+
+. print

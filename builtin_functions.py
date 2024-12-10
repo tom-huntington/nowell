@@ -27,6 +27,7 @@ rename_illegal = {
     ".": "b",
     "map": "flipped_map",
     "starmap": "flipped_starmap",
+    "filter": "flipped_filter",
 }
 
 
@@ -40,10 +41,10 @@ def needed_env(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         # Call the original function
-        needed_env = get_needed_env(args)
+        needed_env = get_needed_env((*args, func))
         if needed_env:
             def curry_env(env):
-                return func(*args, **kwargs, env=env)
+                return call_providing_env(func, *args, **kwargs, env=env)
             curry_env.needed_env = needed_env
             return curry_env
         else:
@@ -57,6 +58,10 @@ def flipped_map(arg0, arg1, *args_, env=None):
 def flipped_starmap(arg0, arg1, *args_, env=None):
     *args, func = (arg0, arg1, *args_)
     return call_providing_env(starmap, func, *args, env=env)
+
+def flipped_filter(arg0, arg1, *args_, env=None):
+    *args, func = (arg0, arg1, *args_)
+    return call_providing_env(filter, func, *args, env=env)
 
 
 @needed_env
@@ -92,7 +97,112 @@ def flatten(ls):
     return tuple(item for sublist in ls for item in sublist)
 
 @needed_env
-def S(f, *, env=None):
-    def S_r(x):
+def W(f, *, env=None):
+    def W_r(x):
         return call_providing_env(f, x, x, env=env)
+    return W_r
+
+@needed_env
+def S(f, g, *, env=None):
+    def S_r(x):
+        y = call_providing_env(f, x, env=env)
+        return call_providing_env(g, x, y, env=env)
     return S_r
+
+@needed_env
+def i(x):
+    return x
+
+@needed_env
+def box(x):
+    return [x]
+
+@needed_env
+def conditional(pred, true, false):
+    def conditional_r(*args):
+        if pred(*args):
+            return true(*args)
+        else:
+            return false(*args)
+    return conditional_r
+
+@needed_env
+def K(x, _):
+    return x
+
+@needed_env
+def odd(x):
+    return x % 2
+
+@needed_env
+def even(x):
+    return not (x % 2)
+
+@needed_env
+def values(xs):
+    return xs[1]
+
+@needed_env
+def keys(xs):
+    return xs[0]
+
+@needed_env
+def phi(f, g, h):
+    def phi_r(x):
+        x_ = f(x)
+        y_ = g(x)
+        return h(x_, y_)
+    return phi_r
+
+@needed_env
+def splititerate(acc, func, *, env=None):
+    while True:
+        acc, r = call_providing_env(func, acc, env=env)
+        yield (acc, r)
+
+@needed_env
+def mapAccum(acc, xs, func, env=None):
+    res = []
+    for x in xs:
+        acc, r = call_providing_env(func, acc, x, env=env)
+        res.append(r)
+    return (acc, res)
+
+
+@needed_env
+def stopat(it, pred, *, env=None):
+   while True:
+       x = next(it)
+       yield x
+       if call_providing_env(pred, x, env=env): return
+
+@needed_env
+def not_(x, env=None):
+    return not provide_enviroment(x, env=env)
+
+
+# def step(*, env):
+#     def step_r(trails):
+#         grid = env["grid"]
+#         nines = []
+#         new_trails = []
+#         for pos, old_height in ((t+dir, grid[t]) for t in trails for dir in [1,-1,1j,-1j]):
+#             if grid.get(pos, None) == old_height+1:
+#                 if grid.get(pos, None) == 9: nines.append(pos)
+#                 else: new_trails.append(pos)
+#         return (nines, new_trails)
+#     step.needed_env = {"grid"}
+#     return step_r
+
+# step.needed_env = {"grid"}
+
+def real(c):
+    return c.real
+
+def imag(c):
+    return c.imag
+
+
+def log(x):
+    print(x)
+    return x

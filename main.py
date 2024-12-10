@@ -7,6 +7,7 @@ from functools import partial
 import itertools
 from builtin_functions import *
 from collections.abc import Iterable
+import builtin_functions
 
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'grammar.lark')) as f:
@@ -17,8 +18,8 @@ parser = Lark(grammar)
 
 def flatten_irregular(xs):
     for x in xs:
-        if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
-            yield from flatten(x)
+        if isinstance(x, Iterable) and not isinstance(x, (str, bytes, Token)):
+            yield from flatten_irregular(x)
         else:
             yield x
 
@@ -33,13 +34,14 @@ def provide_env(tree, env_names):
                 return child.value
             
             def closure(self, children):
-                return tuple(flatten_irregular(children[:-1]))
+                return flatten_irregular(children[:-1])
             
         # print(tree)
         o = Flatten().transform(tree)
-        new_names = set(o)
-        assert len(new_names) == len(o)
-        env_names = env_names.union(o)
+        o_ = list(o)
+        new_names = set(o_)
+        assert len(new_names) == len(o_)
+        env_names = env_names.union(o_)
     
     tree.env_names = env_names
     
@@ -103,7 +105,7 @@ class Parser(Transformer):
                             env_[name] = value
                 
                 set_variables(names, values)
-                return body(env_) if getattr(body, 'needed_env', False) else body
+                return body(env=env_) if getattr(body, 'needed_env', False) else body
             return closure_rr
         
         if needed_env:
@@ -119,8 +121,10 @@ class Parser(Transformer):
         #         break
 
         needed_env = set.union(*(getattr(arg, 'needed_env', set()) for arg in children))
-        tmp = tuple((len(signature(child).parameters), i) for i, child in enumerate(children))
-        _, max_index = max(tmp)
+        max_index = not bool(getattr(children[0], '__call__', False))
+        # tmp = tuple((len(signature(child.__call__).parameters), i) for i, child in enumerate(children))
+        # _, max_index = max(tmp)
+        
         if max_index == 1:
             if needed_env:
                 def partial1_r(*, env):
@@ -131,18 +135,18 @@ class Parser(Transformer):
             else:
                 arg, op = children
                 return partial(op, arg)
-
-
         else:
             op, arg1 = children
-            def partial2_r(*args, **kwargs):
-                arg0, *args2 = args
-                args = provide_enviroment((arg0, arg1, *args2), **kwargs)
-                if getattr(op, 'needed_env', None):
-                    return op(*args, **kwargs)
-                else:
-                    return op(*args)
-            return partial2_r
+            def partial2_r(*, env):
+                def partial2_r_inner(*args):
+                    arg0, *args2 = args
+                    return call_providing_env(op, arg0, arg1, *args2, env=env)
+                return partial2_r_inner
+            if needed_env:
+                partial2_r.needed_env = needed_env
+                return partial2_r
+            else: return partial2_r(env=None)
+
 
 
     def ident(self, args):
@@ -157,6 +161,16 @@ class Parser(Transformer):
             return indent_r
         else:
             return eval(value)
+    
+    def FUNCTION(self, arg):
+        arg, env_names = arg.value
+        # we could support being a capture!!!
+        name, = re.match(r'\s+def (.+)\(', arg).groups()
+        exec(arg, globals=globals())
+        for n in eval(name).__code__.co_names:
+            if n in env_names:
+                env_names.add(n)
+        return Token("FUNCTION", (name, env_names))
 
 
 
@@ -195,9 +209,7 @@ def print_iterable(obj):
         print(obj)
 
 code = r"""
-from itertools import product
-from operator import sub
-product |> S . (map \(a b) -> a sub b)
+\ab -> ab
 """
 
 if __name__ == "__main__":
