@@ -163,14 +163,25 @@ class Parser(Transformer):
             return eval(value)
     
     def FUNCTION(self, arg):
-        arg, env_names = arg.value
+        definition, env_names = arg.value
         # we could support being a capture!!!
-        name, = re.match(r'\s+def (.+)\(', arg).groups()
-        exec(arg, globals=globals())
-        for n in eval(name).__code__.co_names:
+        name, = re.match(r'\s+def (.+)\(', definition).groups()
+
+        needed_env = set()
+        for n in re.findall(r'\b\w+\b', definition):
             if n in env_names:
-                env_names.add(n)
-        return Token("FUNCTION", (name, env_names))
+                needed_env.add(n)
+
+        unpackenv = ''.join(f"{n} = env['{n}']\n" for n in needed_env)
+        def indent_block(b : str, times = 1):
+            return '    ' + b.replace('\n', '\n' + times * '    ')
+        
+        closure_ = f"def make_{name}(*, env):\n" + indent_block(unpackenv) + indent_block(definition) + f'\n    return {name}'
+        print(closure_)
+        exec(closure_, globals=globals())
+        c = eval(f"make_{name}")
+        c.needed_env = needed_env
+        return Token("FUNCTION", (f"make_{name}", needed_env))
 
 
 
@@ -209,12 +220,16 @@ def print_iterable(obj):
         print(obj)
 
 code = r"""
-\ab -> ab
+ab -> 1 |>
+def cap(x):
+    return ab
+
+
 """
 
 if __name__ == "__main__":
             #(|| (map \a -> \b -> a pair b))
-    out = evaluate_code(code, [[1,2]])
+    out = evaluate_code(code, [1])
     print_iterable(out)
 
 

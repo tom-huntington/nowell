@@ -1,11 +1,11 @@
 start: ident | ncall | closure | eexpr
-call: (call | texpr) ("_" texpr)* texpr texpr
-ncall: (call | texpr) (" _ " texpr)* texpr eexpr
+call: (call | texpr) ("_ " texpr)* texpr texpr
+ncall: (call | texpr) ("_ " texpr)* texpr eexpr
 ?eexpr: texpr | nexpr
 ?nexpr: "\\" (eexpr | ncall | ident | closure | partial)
 ?texpr: ident | "(" (eexpr | ident | ncall | closure | partial) ")"
 partial: texpr eexpr
-closure: destruct "-> " (eexpr | call)
+closure: destruct "->" (eexpr | call)
 destruct: (IDENT | "(" destruct ")")+
 ident: IDENT | SPECIAL | FUNCTION | STRING | NUMBER
 STRING: /'[^']*'/

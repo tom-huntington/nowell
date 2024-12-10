@@ -1,8 +1,8 @@
 from operator import eq
 
 read . str.splitlines . enumerate . (starmap \i r -> r |> enumerate starmap (j c -> i complex j pair (c |> ((eq '.') _ (-1 K) conditional int) ) )) . flatten . dict .
-(grid -> grid |> dict.items filter (values . (eq 0)) map (keys . box . (splititerate (
-def step(trails, grid):
+(grid -> grid |> dict.items filter (values . (eq 0)) map (keys . box . (splititerate
+def step(trails):
     print("heights ", [grid[x] for x in trails], trails)
     nines = []
     new_trails = []
@@ -15,9 +15,6 @@ def step(trails, grid):
                 new_trails.append(pos)
     print(new_trails, len(nines))
     return (new_trails, nines)
-
-grid
-)
 
 )
 . (stopat (keys . not)) . (map values) 
