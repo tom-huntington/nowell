@@ -172,16 +172,21 @@ class Parser(Transformer):
             if n in env_names:
                 needed_env.add(n)
 
-        unpackenv = ''.join(f"{n} = env['{n}']\n" for n in needed_env)
-        def indent_block(b : str, times = 1):
-            return '    ' + b.replace('\n', '\n' + times * '    ')
-        
-        closure_ = f"def make_{name}(*, env):\n" + indent_block(unpackenv) + indent_block(definition) + f'\n    return {name}'
-        # print(closure_)
-        exec(closure_, globals=globals())
-        c = eval(f"make_{name}")
-        c.needed_env = needed_env
-        return Token("FUNCTION", (f"make_{name}", needed_env))
+        if needed_env:
+            unpackenv = ''.join(f"{n} = env['{n}']\n" for n in needed_env)
+            def indent_block(b : str, times = 1):
+                return '    ' + b.replace('\n', '\n' + times * '    ')
+            
+            closure_ = f"def make_{name}(*, env):\n" + indent_block(unpackenv) + indent_block(definition) + f'\n    return {name}'
+            # print(closure_)
+            exec(closure_, globals=globals())
+            c = eval(f"make_{name}")
+            c.needed_env = needed_env
+            return Token("FUNCTION", (f"make_{name}", needed_env))
+        else:
+            exec(definition, globals=globals())
+            return Token("FUNCTION", (name, needed_env))
+
 
 
 

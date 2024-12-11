@@ -2,6 +2,7 @@ from operator import eq
 
 read . str.splitlines . enumerate . (starmap \i r -> r |> enumerate starmap (j c -> i complex j pair (c |> ((eq '.') _ (-1 K) conditional int) ) )) . flatten . dict ..
 \grid -> dict.items . (filter (values . (eq 0))) . (map (keys . box . (split_iterate
+
 def step(trails):
     nines, new_trails = [], []
     for pos, old_height in ((t+dir, grid[t]) for t in trails for dir in [1,-1,1j,-1j]):
@@ -13,7 +14,7 @@ def step(trails):
     return (new_trails, nines)
 
 )
-. (stopat (keys . not)) . (map values) 
+. (stop_at (keys . not)) . (map values) 
 . flatten . set . len
 )
 ) . sum

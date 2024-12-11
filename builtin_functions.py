@@ -1,6 +1,7 @@
 from functools import reduce
 from itertools import starmap
 from functools import wraps
+from collections.abc import Iterable
 
 def get_needed_env(children):
     return set.union(*(getattr(arg, 'needed_env', set()) for arg in children))
@@ -29,6 +30,7 @@ rename_illegal = {
     "map": "flipped_map",
     "starmap": "flipped_starmap",
     "filter": "flipped_filter",
+    "reduce": "flipped_reduce"
 }
 
 
@@ -162,6 +164,12 @@ def split_iterate(acc, func, *, env=None):
         yield (acc, r)
 
 @needed_env
+def iterate(acc, func, *, env=None):
+    while True:
+        acc = call_providing_env(func, acc, env=env)
+        yield acc
+
+@needed_env
 def mapAccum(acc, xs, func, env=None):
     res = []
     for x in xs:
@@ -171,7 +179,7 @@ def mapAccum(acc, xs, func, env=None):
 
 
 @needed_env
-def stopat(it, pred, *, env=None):
+def stop_at(it, pred, *, env=None):
    while True:
        x = next(it)
        yield x
@@ -205,6 +213,8 @@ def imag(c):
 
 
 def log(x):
+    if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
+        x = list(x)
     print(x)
     return x
 
@@ -214,3 +224,25 @@ def b_curried_w(f, g):
         x_ = f(x)
         return g(x_)(x_)
     return b_curried_w_r
+
+@needed_env
+def mixed_flatten(xs):
+    return tuple(e for el in xs for e in (el if isinstance(el, Iterable) and not  isinstance(el, (str, bytes)) else (el,)))
+
+@needed_env
+def take(it, num):
+    return tuple(next(it) for _ in range(num))
+
+@needed_env
+def last(xs):
+    return xs[-1]
+
+# @needed_env
+# def scan1(xs, func, *, env=None):
+#     for x in xs:
+#         yield call_providing_env(func, x, )
+
+
+@needed_env
+def flipped_reduce(xs, func, *, env=None):
+    return call_providing_env(reduce, func, xs, env=env)

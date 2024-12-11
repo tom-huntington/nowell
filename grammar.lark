@@ -1,18 +1,19 @@
 start: ident | ncall | closure | eexpr
-call: (call | texpr) ("_ " texpr)* texpr texpr
-ncall: (call | texpr) ("_ " texpr)* texpr eexpr
+call: (call | texpr _ws) ("_" texpr _ws)* texpr _ws texpr
+ncall: (call | texpr _ws) ("_" texpr _ws)* texpr _ws eexpr
 ?eexpr: texpr | nexpr
 ?nexpr: "\\" (eexpr | ncall | ident | closure | partial)
 ?texpr: ident | "(" (eexpr | ident | ncall | closure | partial) ")"
 partial: texpr eexpr
 closure: destruct "->" (eexpr | call)
 destruct: (IDENT | "(" destruct ")")+
-ident: IDENT | SPECIAL | FUNCTION | STRING | NUMBER
-STRING: /'[^']*'/
+_ws: "\n" | " "
+ident: STRING | IDENT | SPECIAL | FUNCTION | NUMBER
+STRING . 1: /r?'[^']*'/
 SPECIAL: /\|>|\.\.|\./ 
 NUMBER: /-[0-9]+/
-IDENT: /((str|dict)\.)?[A-Za-z0-9][A-Za-z0-9_]*/
-FUNCTION: /\ndef\s+([a-zA-Z_]+)\((.|\n)*?\n\n/
+IDENT: /((str|dict|Counter)\.)?[A-Za-z0-9][A-Za-z0-9_]*/
+FUNCTION.1: /\ndef\s+([a-zA-Z_]+)\((.|\n)*?\n\n/
 
 %import common.WS
 %ignore WS

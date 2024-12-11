@@ -1,0 +1,15 @@
+from re import findall
+from math import log10
+
+read . (r'\d+' findall) . (map int) . (iterate ( (map
+def change(num):
+    if num == 0: return 1
+    digits = int(log10(num) + 1)
+    if digits % 2: return num * 2024
+    else: 
+        divisor = 10 ** (digits//2)
+        return (num // divisor, num % divisor)
+
+) . mixed_flatten 
+) )
+. (take 25) . last . len

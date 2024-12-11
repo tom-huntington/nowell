@@ -1,0 +1,19 @@
+from re import findall
+from math import log10
+from collections import Counter
+from operator import add
+
+read . (r'\d+' findall) . (map int) . Counter . (iterate (Counter.items . (map
+def change(t):
+    num, count = t
+    if num == 0: return Counter({1: count})
+    digits = int(log10(num)) + 1
+    if digits % 2: 
+        return Counter({num * 2024: count})
+    else: 
+        divisor = 10 ** (digits//2)
+        return Counter({num // divisor: count}) + Counter({num % divisor: count})
+
+) . (reduce add)
+) )
+. (take 75) . last . Counter.values . sum
