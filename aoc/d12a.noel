@@ -1,0 +1,31 @@
+from operator import mul
+
+read . str.splitlines . enumerate . (starmap \i r -> r |> enumerate starmap (j c -> i complex j pair c) ) . flatten . dict ..
+(grid -> set . ( excluding_map (
+def flood(pos):
+    todo = {pos}
+    seen = set()
+    while todo:
+        e = todo.pop()
+        yield e
+        for dir in (1,-1,1j,-1j):
+            p = dir + e
+            if p not in seen and grid.get(p, None) == grid.get(pos, False):
+                seen.add(p)
+                todo.add(p)
+
+)) . (map (component -> component |> ( len _ mul Phi ( (map (
+def sides(pos):
+    adjacent = [dir+pos in component for dir in (1,-1,1j,-1j)]
+    #print("adjacent", adjacent)
+    return 4 - sum(adjacent)
+
+) ) . sum  ) ) 
+
+
+)
+
+
+)
+
+) . sum

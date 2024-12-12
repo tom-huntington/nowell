@@ -158,6 +158,14 @@ def phi(f, g, h):
     return phi_r
 
 @needed_env
+def Phi(f, h, g):
+    def Phi_r(x):
+        x_ = f(x)
+        y_ = g(x)
+        return h(x_, y_)
+    return Phi_r
+
+@needed_env
 def split_iterate(acc, func, *, env=None):
     while True:
         acc, r = call_providing_env(func, acc, env=env)
@@ -246,3 +254,13 @@ def last(xs):
 @needed_env
 def flipped_reduce(xs, func, *, env=None):
     return call_providing_env(reduce, func, xs, env=env)
+
+@needed_env
+def excluding_map(xs, func, *, env=None):
+    while xs:
+        x = next(iter(xs))
+        out = set(call_providing_env(func, x, env=env))
+        print(out, "---", xs)
+        yield out
+        xs -= out
+
