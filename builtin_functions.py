@@ -245,6 +245,14 @@ def take(it, num):
 def last(xs):
     return xs[-1]
 
+@needed_env
+def first(xs):
+    return xs[0]
+
+@needed_env
+def second(xs):
+    return xs[1]
+
 # @needed_env
 # def scan1(xs, func, *, env=None):
 #     for x in xs:

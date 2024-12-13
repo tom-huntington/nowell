@@ -1,0 +1,22 @@
+from scipy.linalg import lu
+from sympy import Matrix
+from itertools import batched
+from re import findall
+from numpy import array
+from itertools import starmap
+from sympy.core.numbers import Rational
+
+read . (r'\d+' findall) . (map int) . (batched 6) . (starmap \ (lambda a, b, c, d, e, f: Matrix([[a, c, -e-10000000000000], [b, d, -f-10000000000000]])) . Matrix.rref . first . (
+def a(m):
+    assert m[0, 0] == 1
+    assert m[1, 0] == 0
+    assert m[0, 1] == 0
+    assert m[1, 1] == 1
+    if Rational in (type(m[1, 2]), type(m[0, 2])): return 0
+    print(type(m[1, 2]), type(m[0, 2]))
+    print(m)
+    assert type(m[1, 2]) != Rational
+    assert type(m[0, 2]) != Rational
+    return -m[0,2] * 3 - m[1,2]
+
+)) . sum

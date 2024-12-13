@@ -161,7 +161,7 @@ class Parser(Transformer):
             return indent_r
         else:
             return eval(value)
-    
+
     def FUNCTION(self, arg):
         definition, env_names = arg.value
         # we could support being a capture!!!
@@ -193,7 +193,7 @@ class Parser(Transformer):
 def evaluate_code(ex, args):
 
     while True:
-        if m := re.match(r"^\s*from\s+(\w+)\s+import\s+(\w+)\n", ex):
+        if m := re.match(r"^\s*from\s+(\.|\w)+\s+import\s+(\w+)\n", ex):
             # print(f"execing: {m.group()}")
             exec(m.group(), globals())
             ex = ex[m.end():]

@@ -8,12 +8,13 @@ partial: texpr eexpr
 closure: destruct "->" (eexpr | call)
 destruct: (IDENT | "(" destruct ")")+
 _ws: "\n" | " "
-ident: STRING | IDENT | SPECIAL | FUNCTION | NUMBER
+ident: STRING | IDENT | SPECIAL | FUNCTION | NUMBER | LAMBDA
 STRING . 1: /r?'[^']*'/
 SPECIAL: /\|>|\.\.|\./ 
 NUMBER: /-[0-9]+/
-IDENT: /((str|dict|Counter)\.)?[A-Za-z0-9][A-Za-z0-9_]*/
+IDENT: /((str|dict|Counter|Matrix)\.)?[A-Za-z0-9][A-Za-z0-9_]*/
 FUNCTION.1: /\ndef\s+([a-zA-Z_]+)\((.|\n)*?\n\n/
+LAMBDA . 1: /lambda (?:[^()]*\(.*?\)[^()]*|[^()]+)/
 
 %import common.WS
 %ignore WS
