@@ -1,0 +1,19 @@
+from re import findall
+from itertools import batched
+from operator import mul
+from collections import Counter
+from math import prod
+from itertools import count
+from operator import sub
+
+read . (r'-?\d+' findall) . (map int) . (batched 4) . list . (start -> 0 count 1 map (i -> 
+start starmap (
+def func(a, b, c, d):
+    return ((a + i * c)% 101, (b + i * d) % 103)
+
+)
+|> Counter |> Counter.values |> prod
+))
+. (stop_at (== 1)) . list . len . (sub 1)
+        
+    

@@ -2,6 +2,9 @@ from functools import reduce
 from itertools import starmap
 from functools import wraps
 from collections.abc import Iterable
+from operator import eq
+from itertools import count
+from collections import Counter
 
 def get_needed_env(children):
     return set.union(*(getattr(arg, 'needed_env', set()) for arg in children))
@@ -30,7 +33,9 @@ rename_illegal = {
     "map": "flipped_map",
     "starmap": "flipped_starmap",
     "filter": "flipped_filter",
-    "reduce": "flipped_reduce"
+    "reduce": "flipped_reduce",
+    "<=>": "three_way_compare",
+    "==": "eq",
 }
 
 
@@ -188,8 +193,9 @@ def mapAccum(acc, xs, func, env=None):
 
 @needed_env
 def stop_at(it, pred, *, env=None):
-   while True:
+   for i in count(0, 1):
        x = next(it)
+       print(i, x)
        yield x
        if call_providing_env(pred, x, env=env): return
 
@@ -221,7 +227,7 @@ def imag(c):
 
 
 def log(x):
-    if isinstance(x, Iterable) and not isinstance(x, (str, bytes)):
+    if isinstance(x, Iterable) and not isinstance(x, (str, bytes, Counter)):
         x = list(x)
     print(x)
     return x
@@ -272,3 +278,10 @@ def excluding_map(xs, func, *, env=None):
         yield out
         xs -= out
 
+@needed_env
+def three_way_compare(a, b, env=None):
+    return (a > b) - (a < b)
+
+@needed_env
+def starfilter(xs, f, env=None):
+    return filter(lambda x: f(*x), xs)

@@ -1,0 +1,26 @@
+from re import findall
+from itertools import batched
+from operator import mul
+from collections import Counter
+from math import prod
+from itertools import count
+from operator import sub
+
+read . (r'-?\d+' findall) . (map int) . (batched 4) . list . (start -> 6532 count 1 map (i -> 
+start starmap (
+def func(a, b, c, d):
+    return (three_way_compare((a + i * c)% 101, 101//2), (b + i * d) % 103)
+
+)
+starfilter mul
+|> Counter |> (c -> c map (
+def func(k):
+    print(c[k], c[(-k[0], k[1])])
+    return abs(c[k] - c[(-k[0], k[1])])
+
+
+)) |> sum
+))
+. (take 1)
+        
+    

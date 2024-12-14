@@ -1,0 +1,8 @@
+from re import findall
+from itertools import batched
+from operator import mul
+from collections import Counter
+from math import prod
+
+read . (r'-?\d+' findall) . (map int) . (batched 4) . (starmap \ (lambda a, b, c, d: (three_way_compare((a + 100 * c)% 101, 101//2), three_way_compare((b + 100 * d) % 103, 103//2))
+) ) . (starfilter mul) . Counter . Counter.values . prod
