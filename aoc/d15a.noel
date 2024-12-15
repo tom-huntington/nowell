@@ -1,0 +1,20 @@
+read . (str.split '\n\n') . ((str.splitlines . enumerate . (starmap \i r -> r |> enumerate starmap (j c -> j complex i pair c) ) . flatten . dict) *** 
+\ map lambda move: {'<': -1, '>': 1, '^': -1j, 'v': 1j, '\n': complex() }[move]
+) .
+\(init moves) -> moves _ (init pair \ init find_key '@') fold (
+def inv(acc, dir):
+    state, pos = acc
+    for i in count(1, 1):
+        match state[i*dir + pos]:
+            case '.' | '@': 
+                state[i*dir + pos], state[dir + pos] = state[dir + pos], state[i*dir + pos]
+                print("move", pos + dir, i, pos, 'target', i*dir + pos, state[i*dir + pos])
+                return (state, pos + dir)
+            case '#': 
+                print("no move", pos)
+                return (state, pos)
+
+) |> first |> dict.items filter lambda x: x[1] == 'O'
+|> (map lambda c: c[0].imag * 100 + c[0].real
+) |> sum
+

@@ -1,0 +1,22 @@
+read . lambda x: x.replace('.', '..').replace('#', '##').replace('O', '[]').replace('@', '@.')
+
+. (str.split '\n\n') . ((str.splitlines . enumerate . (starmap \i r -> r |> enumerate starmap (j c -> j complex i pair c) ) . flatten . dict) *** 
+\ map lambda move: {'<': -1, '>': 1, '^': -1j, 'v': 1j, '\n': complex() }[move]
+) .
+\(init moves) -> moves _ (init pair \ init find_key '@') fold (
+def inv(acc, dir):
+    state, pos = acc
+    modified_state = dict(state)
+    def recurse(poss):
+        def nxt(pos):
+            match state[pos + dir]:
+                case '[': return (pos+dir, )
+
+        {e for pos in poss for e in nxt(pos)}
+        match state[pos + dir]:
+            case 
+
+) |> first |> dict.items filter lambda x: x[1] == 'O'
+|> (map lambda c: c[0].imag * 100 + c[0].real
+) |> sum
+

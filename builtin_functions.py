@@ -285,3 +285,19 @@ def three_way_compare(a, b, env=None):
 @needed_env
 def starfilter(xs, f, env=None):
     return filter(lambda x: f(*x), xs)
+
+
+@needed_env
+def parallel(*funcs, env=None):
+    def parallel_r(it):
+        return [call_providing_env(f, i, env=env) for f, i in zip(funcs, it)]
+
+    return parallel_r
+
+@needed_env
+def find_key(dict, value):
+    return next(k for k,v in dict.items() if v == value)
+
+@needed_env
+def fold(xs, init, f, *, env=None):
+    return call_providing_env(reduce, f, xs, init, env=env)
