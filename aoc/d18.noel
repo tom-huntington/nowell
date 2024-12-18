@@ -1,0 +1,18 @@
+from re import findall
+from itertools import batched
+from itertools import starmap
+from operator import add
+
+read . (r'\d+' findall) . (map int) . (batched 2) . (take 1024)  . (starmap complex) . set
+. \corrupted -> (0 |> complex |> single) iterate ((flat_map
+def handle(pos):
+    if not hasattr(handle, 'seen'): handle.corr = corrupted
+    handle.corr.add(pos)
+    b = 71
+    return [pos+dir for dir in (1, -1, 1j, -1j) if pos+dir not in handle.corr and 0 <= (pos+dir).real < b and 0 <= (pos+dir).imag < b ]
+
+) . set )
+
+|> enumerate
+stop_at (second . (70+70j in))
+|> last |> first add 1

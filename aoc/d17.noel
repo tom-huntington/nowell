@@ -1,0 +1,4 @@
+
+
+# how to introduce state???
+. repeat . \ map \ 0 bind \i -> (index i) . 

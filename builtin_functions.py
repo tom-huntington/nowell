@@ -13,6 +13,9 @@ def get_needed_env(children):
 def provide_enviroment(args, **kwargs):
     return tuple(arg(**kwargs) if getattr(arg, 'needed_env', False) else arg for arg in args)
 
+def provide_enviroment2(*args, env):
+    return tuple(arg(env=env) if getattr(arg, 'needed_env', False) else arg for arg in args)
+
 def call_providing_env(func, *args, env):
     args = provide_enviroment(args, env=env)
     if getattr(func, 'needed_env', False):
@@ -180,6 +183,8 @@ def split_iterate(acc, func, *, env=None):
 def iterate(acc, func, *, env=None):
     while True:
         acc = call_providing_env(func, acc, env=env)
+        # print(type(acc), acc)
+        # assert len(acc)
         yield acc
 
 @needed_env
@@ -195,7 +200,7 @@ def mapAccum(acc, xs, func, env=None):
 def stop_at(it, pred, *, env=None):
    for i in count(0, 1):
        x = next(it)
-       print(i, x)
+       # print(i, type(x[1]), len(x[1]), "---")
        yield x
        if call_providing_env(pred, x, env=env): return
 
@@ -249,7 +254,7 @@ def take(it, num):
 
 @needed_env
 def last(xs):
-    return xs[-1]
+    return tuple(xs)[-1]
 
 @needed_env
 def first(xs):
@@ -301,3 +306,21 @@ def find_key(dict, value):
 @needed_env
 def fold(xs, init, f, *, env=None):
     return call_providing_env(reduce, f, xs, init, env=env)
+
+
+@needed_env
+def single(x):
+    return (x,)
+
+
+@needed_env
+def flat_map(xs, f, *, env=None):
+    lls = call_providing_env(map, f, xs, env=env)
+    ret = flatten(lls)
+    return ret
+
+
+@needed_env
+def in_(a, b, *, env=None):
+    a_, b_ = provide_enviroment2(a,b,env=env)
+    return a_ in b_

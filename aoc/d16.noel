@@ -1,0 +1,9 @@
+
+
+
+split_iterate_heap
+def process_min(e):
+    dist, posdir, prev  = e
+    if posdir in seen: return ([], e)
+    seen.add()
+    return ([90clock, straight, 90anit], e)
