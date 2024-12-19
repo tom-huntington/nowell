@@ -6,7 +6,7 @@ from main import evaluate_code, print_iterable
 
 
 # file_name = sys.argv[1]
-file_name = "d18"
+file_name = "d19"
 # extension = "in" 
 extension = "in" 
 # extension = sys.argv[2]

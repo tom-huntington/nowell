@@ -16,6 +16,9 @@ def provide_enviroment(args, **kwargs):
 def provide_enviroment2(*args, env):
     return tuple(arg(env=env) if getattr(arg, 'needed_env', False) else arg for arg in args)
 
+def provide_enviroment3(arg, env):
+    return arg(env=env) if getattr(arg, 'needed_env', False) else arg
+
 def call_providing_env(func, *args, env):
     args = provide_enviroment(args, env=env)
     if getattr(func, 'needed_env', False):
@@ -183,6 +186,7 @@ def split_iterate(acc, func, *, env=None):
 def iterate(acc, func, *, env=None):
     while True:
         acc = call_providing_env(func, acc, env=env)
+        # print(len(acc))
         # print(type(acc), acc)
         # assert len(acc)
         yield acc
@@ -200,13 +204,13 @@ def mapAccum(acc, xs, func, env=None):
 def stop_at(it, pred, *, env=None):
    for i in count(0, 1):
        x = next(it)
-       # print(i, type(x[1]), len(x[1]), "---")
+       #print(i, len(x), x, "---")
        yield x
        if call_providing_env(pred, x, env=env): return
 
 @needed_env
 def not_(x, env=None):
-    return not provide_enviroment(x, env=env)
+    return not provide_enviroment3(x, env=env)
 
 
 # def step(*, env):
@@ -324,3 +328,21 @@ def flat_map(xs, f, *, env=None):
 def in_(a, b, *, env=None):
     a_, b_ = provide_enviroment2(a,b,env=env)
     return a_ in b_
+
+
+@needed_env
+def monadic_bind(xs, f, *, env=None):
+    match xs:
+        case list(): return flat_map(xs, f, env=env)
+        case Counter(): 
+            lls = call_providing_env(map, f, xs, env=env)
+            temp = [Counter({k: v*count}) for count, counter in zip(xs.values(), lls) for k,v in counter.items()]
+            return sum(temp, Counter()) 
+            
+            
+        case _: raise NotImplementedError()
+
+
+@needed_env
+def collect_map(xs, f, *, env=None):
+    return tuple(call_providing_env(map, f, xs, env=env))

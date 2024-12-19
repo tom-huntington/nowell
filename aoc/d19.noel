@@ -1,0 +1,10 @@
+from collections import Counter
+
+read . (str.split '\n\n') . ((str.split ', ') *** str.splitlines) . \ (patterns designs) ->
+designs map (single . Counter . (iterate (monadic_bind (
+def handle(suffix):
+    return Counter(suffix.removeprefix(p) for p in patterns if suffix.startswith(p))
+
+))) . (stop_at (len . not)) . (flat_map Counter.items) . (filter (keys . len . not)) . (map values) . sum
+
+) |> sum

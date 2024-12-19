@@ -1,0 +1,8 @@
+read . (str.split '\n\n') . ((str.split ', ') *** str.splitlines) . \ (patterns designs) ->
+designs map ( single . (iterate ((flat_map (
+def handle(suffix):
+    return [suffix.removeprefix(p) for p in patterns if suffix.startswith(p)]
+
+)) . set )) . (stop_at (len . not)) . (flat_map (map (len . not))) . sum
+
+) |> sum
