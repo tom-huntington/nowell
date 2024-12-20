@@ -185,11 +185,11 @@ def split_iterate(acc, func, *, env=None):
 @needed_env
 def iterate(acc, func, *, env=None):
     while True:
+        yield acc
         acc = call_providing_env(func, acc, env=env)
         # print(len(acc))
         # print(type(acc), acc)
         # assert len(acc)
-        yield acc
 
 @needed_env
 def mapAccum(acc, xs, func, env=None):
@@ -204,9 +204,16 @@ def mapAccum(acc, xs, func, env=None):
 def stop_at(it, pred, *, env=None):
    for i in count(0, 1):
        x = next(it)
-       #print(i, len(x), x, "---")
+       print(x, "---")
        yield x
        if call_providing_env(pred, x, env=env): return
+
+@needed_env
+def take_while(it, pred, *, env=None):
+   for i in count(0, 1):
+       x = next(it)
+       if call_providing_env(pred, x, env=env): return
+       yield x
 
 @needed_env
 def not_(x, env=None):
@@ -262,7 +269,7 @@ def last(xs):
 
 @needed_env
 def first(xs):
-    return xs[0]
+    return next(iter(xs))
 
 @needed_env
 def second(xs):
@@ -346,3 +353,17 @@ def monadic_bind(xs, f, *, env=None):
 @needed_env
 def collect_map(xs, f, *, env=None):
     return tuple(call_providing_env(map, f, xs, env=env))
+
+
+@needed_env
+def grid_dict(s):
+    return {complex(i, j): c for j,line in enumerate(s.splitlines()) for i,c in enumerate(line) }
+
+@needed_env
+def index(xs, i, *, env=None):
+    xs_, i_ = provide_enviroment2(xs, i, env=env)
+    return xs_[i_]
+
+@needed_env
+def count_if(xs, pred, *, env=None):
+    return sum(1 for x in xs if pred(x))

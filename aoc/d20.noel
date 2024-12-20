@@ -1,0 +1,24 @@
+from operator import ne
+from itertools import combinations
+
+read . grid_dict . dict.items . (filter (second . (ne '#'))) . dict . \track -> 
+track |> (dict.items . (filter (second . (== 'S'))) . next . first ) 
+pair None iterate (
+def handle(x): 
+    return next((d+x[0], d) for d in (1,-1,1j,-1j) if -d!=x[1] and d+x[0] in track)
+
+)
+map first
+|> enumerate
+stop_at (\(i pos) -> track index pos == 'E')
+map ((a b) -> b pair a)
+|> dict |> (
+\dist -> 
+track combinations 2 count_if (
+def hh(x): 
+    q, p = x
+    d = abs((p-q).real) + abs((p-q).imag)
+    return d < 21 and abs(dist[p]-dist[q])-d >= 100
+    #return d == 2 and abs(dist[p]-dist[q])-d >= 100 
+
+))
