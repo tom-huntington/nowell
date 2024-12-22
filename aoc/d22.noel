@@ -1,0 +1,33 @@
+from re import findall
+from operator import xor
+from operator import floordiv
+from operator import mul
+from operator import mod
+from operator import sub
+from operator import add
+from itertools import pairwise
+from more_itertools import windowed
+from collections import Counter
+
+def hash(x):
+    #(
+    #((mul 64) S xor . (mod 16777216))
+    #. ((floordiv 32) S xor . (mod 16777216))
+    #. ((mul 2048) S xor . (mod 16777216))
+    #)
+    x = xor(x * 64, x) % 16777216
+    x = xor(x // 32, x) % 16777216
+    return xor(x * 2048, x) % 16777216
+
+
+read . (r'\d+' findall) . (map int) . (map (
+(iterate hash)
+. (take 2000) . (map (mod 10)) . tuple .
+(pairwise . (starmap (sub |> flip)) . (windowed 4) _ (drop 4) phi zip . list . reversed
+. dict . Counter
+)
+
+)
+)
+. (fold1 add)
+. Counter.values . max

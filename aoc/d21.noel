@@ -1,0 +1,29 @@
+from operator import ne
+from operator import sub
+from itertools import pairwise
+from itertools import starmap
+from cmath import phase
+from math import pi
+from math import ceil
+from functools import cache
+from itertools import permutations
+
+numeric_map := '789\n456\n123\n 0A' string_positions_if (ne ' ') map (reversed . tuple) |> dict
+directional_map := ' ^A\n<v>' string_positions_if (ne ' ') map (reversed . tuple) |> dict
+
+@cache
+def min_moves(delta, bot):
+    if bot == 3: return abs(delta.real) + abs(delta.imag)
+    re, im = int(delta.real) + int(delta.imag)
+    deltas = lambda path: (starmap(sub, pairwise(directional_map[p] for p in path)))
+    min_moves( deltas(path) for path in permutations('<' * re + '>' * -re  + '^' * im + 'v' * -im))
+    
+
+
+read . str.splitlines . (
+map \ (map (access numeric_map)) . pairwise . (starmap (sub . moves)) . flatten 
+. (map (access directional_map)) . pairwise . (starmap (sub . moves)) . flatten 
+. (map (access directional_map)) . pairwise . (starmap (sub . moves)) . flatten 
+. (map (access directional_map)) . pairwise . (starmap (sub . moves)) . flatten 
+. len
+)

@@ -193,7 +193,26 @@ class Parser(Transformer):
 def evaluate_code(ex, args):
 
     while True:
-        if m := re.match(r"^\s*from\s+(\.|\w)+\s+import\s+(\w+)\n", ex):
+        if m := re.match(r"^\s*from\s+(\.|_|\w)+\s+import\s+(\w+) *\n", ex):
+            # print(f"execing: {m.group()}")
+            exec(m.group(), globals())
+            ex = ex[m.end():]
+        else: break
+
+    while True:
+        if m := re.match(r"^\s*(\w+)\s+:=\s(.+)\n", ex):
+            # print(f"execing: {m.group()}")
+            name, code = m.groups()
+            ast = parser.parse(code)
+            provide_env(ast, set())
+            program_ = Parser().transform(ast)
+            program, = program_.children
+            globals()[name] = program
+            ex = ex[m.end():]
+        else: break
+
+    while True:
+        if m := re.match(r"^\s*(\@.+\s*)?def\s+([a-zA-Z_]+)\((.|\n)*?\n\n", ex):
             # print(f"execing: {m.group()}")
             exec(m.group(), globals())
             ex = ex[m.end():]

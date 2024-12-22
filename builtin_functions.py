@@ -3,7 +3,7 @@ from itertools import starmap
 from functools import wraps
 from collections.abc import Iterable
 from operator import eq
-from itertools import count
+from itertools import count, islice
 from collections import Counter
 
 def get_needed_env(children):
@@ -21,10 +21,17 @@ def provide_enviroment3(arg, env):
 
 def call_providing_env(func, *args, env):
     args = provide_enviroment(args, env=env)
-    if getattr(func, 'needed_env', False):
-        return func(*args, env=env)
+    is_callable = callable(func)
+    type_ = type(func);
+    list_callable = callable([])
+    if is_callable:
+        if getattr(func, 'needed_env', False):
+            return func(*args, env=env)
+        else:
+            return func(*args)
     else:
-        return func(*args)
+        arg, = args
+        return func[arg]
 
 rename_illegal = {
     "&&&": "fanout",
@@ -318,6 +325,10 @@ def find_key(dict, value):
 def fold(xs, init, f, *, env=None):
     return call_providing_env(reduce, f, xs, init, env=env)
 
+@needed_env
+def fold1(xs, f, *, env=None):
+    return call_providing_env(reduce, f, xs, env=env)
+
 
 @needed_env
 def single(x):
@@ -360,10 +371,43 @@ def grid_dict(s):
     return {complex(i, j): c for j,line in enumerate(s.splitlines()) for i,c in enumerate(line) }
 
 @needed_env
+def string_positions_if(s, pred):
+    return [(complex(i, j), c) for j,line in enumerate(s.splitlines()) for i,c in enumerate(line) if pred(c) ]
+
+
+@needed_env
 def index(xs, i, *, env=None):
+    xs_, i_ = provide_enviroment2(xs, i, env=env)
+    return xs_[i_]
+
+@needed_env
+def access(i, xs, *, env=None):
     xs_, i_ = provide_enviroment2(xs, i, env=env)
     return xs_[i_]
 
 @needed_env
 def count_if(xs, pred, *, env=None):
     return sum(1 for x in xs if pred(x))
+
+
+
+@needed_env
+def iterate_n(n, func, *, env=None):
+    def iterate_n_r(arg):
+        arg_=arg
+        for _ in range(n):
+            arg_= call_providing_env(func, arg_, env=env)
+        return arg_
+    
+    return iterate_n_r
+        
+@needed_env
+def flip(func, *, env=None):
+    def flip_r(*args):
+        return call_providing_env(func, *args[::-1], env=env)
+    return flip_r
+
+
+@needed_env
+def drop(it, num, *, env=None):
+    return call_providing_env(islice, it, num, None, env=env)
