@@ -26,8 +26,6 @@ read . (r'\d+' findall) . (map int) . (map (
 (pairwise . (starmap (sub |> flip)) . (windowed 4) _ (drop 4) phi zip . list . reversed
 . dict . Counter
 )
-
-)
-)
+))
 . (fold1 add)
 . Counter.values . max

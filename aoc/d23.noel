@@ -1,0 +1,19 @@
+from re import findall
+from operator import or_
+from collections import defaultdict
+from itertools import combinations
+
+(
+def h(f):    
+    G = defaultdict(set)
+    for line in f:
+        a, b = line.strip().split('-')
+        G[a].add(b)
+        G[b].add(a)
+    return G
+
+) .. \G ->
+(combinations 3) 
+. (filter ((map (first . (== 't'))) . any ) )
+. (filter (\(a b c)-> (a in (G index b)) and (b in (G index c)) and (c in (G index a)) ))
+. tuple . len

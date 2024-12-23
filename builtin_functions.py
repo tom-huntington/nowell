@@ -2,7 +2,7 @@ from functools import reduce
 from itertools import starmap
 from functools import wraps
 from collections.abc import Iterable
-from operator import eq
+from operator import eq, and_
 from itertools import count, islice
 from collections import Counter
 
@@ -36,6 +36,7 @@ def call_providing_env(func, *args, env):
 rename_illegal = {
     "&&&": "fanout",
     "***": "parallel",
+    "and": "and_",
     "in": "in_",
     # "sorted": "sorted_",
     "not": "not_",
@@ -411,3 +412,10 @@ def flip(func, *, env=None):
 @needed_env
 def drop(it, num, *, env=None):
     return call_providing_env(islice, it, num, None, env=env)
+
+
+class NoelSet(set):
+    def __gt__(self, other):
+        if other == 0: return bool(self)
+        assert 0
+
