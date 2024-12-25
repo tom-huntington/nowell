@@ -1,0 +1,10 @@
+from itertools import product
+
+read . (str.split '\n\n')
+. ((filter (str.startswith '#####')) _ (filter (str.startswith '.....')) phi product)
+. (starmap ((map (lambda a, b: False if a==b=='#' else True
+))
+. all
+)
+
+) . sum

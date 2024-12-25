@@ -1,0 +1,21 @@
+from operator import add
+from re import findall
+from itertools import chain
+from ast import literal_eval
+from operator import and_
+from operator import or_
+from operator import xor
+
+read . (
+((r'(\w\w\w): (0|1)' findall) . (map \(a b) -> a pair (b |> int))) _
+((r'(\w\w\w) (XOR|OR|AND) (\w\w\w) -> (\w\w\w)' findall) . (map lambda x: (x[-1], x[:-1])
+)) phi chain) . dict
+. \D ->
+D |> dict.items filter (first . first . (== 'z')) |> list |> sorted |> reversed map (first . (
+def rec(k):
+    match D[k]:
+        case int(v): return v
+        case (arg1, op, arg2): return {'AND': and_, 'OR': or_, 'XOR': xor}[op](rec(arg1), rec(arg2))
+
+))
+map str |> ('' str.join) int 2

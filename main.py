@@ -136,11 +136,12 @@ class Parser(Transformer):
                 arg, op = children
                 return partial(op, arg)
         else:
-            op, arg1 = children
+            op, arg_last = children
             def partial2_r(*, env):
                 def partial2_r_inner(*args):
-                    arg0, *args2 = args
-                    return call_providing_env(op, arg0, arg1, *args2, env=env)
+                    # arg0, *args2 = args
+                    # return call_providing_env(op, arg0, arg1, *args2, env=env)
+                    return call_providing_env(op, *args, arg_last, env=env)
                 return partial2_r_inner
             if needed_env:
                 partial2_r.needed_env = needed_env
